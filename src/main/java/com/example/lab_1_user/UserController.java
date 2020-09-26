@@ -1,8 +1,9 @@
 package com.example.lab_1_user;
 
 
-import com.example.lab_1_user.data.UserData;
 import com.example.lab_1_user.entities.User;
+import com.example.lab_1_user.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -13,46 +14,50 @@ import java.util.Map;
 
 @RestController
 public class UserController {
-    UserData userData = new UserData();
+    @Autowired
+    UserRepository userRepository;
+
     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
 
     @GetMapping("/user")
     public List<User> index() {
-        return userData.fetchUsers();
+        return userRepository.findAll();
     }
 
     @GetMapping("/user/{id}")
     public User show(@PathVariable String id) {
         int userId = Integer.parseInt(id);
-        return userData.getUserById(userId);
+        return userRepository.findUserById(userId);
     }
 
     @PostMapping("/user")
     public User create(@RequestBody Map<String, String> body) throws ParseException {
-        int id = Integer.parseInt(body.get("id"));
         String firstName = body.get("firstName");
         String lastName = body.get("lastName");
         String email = body.get("email");
         Date birthDate = formatter.parse(body.get("birthDate"));
-        return userData.createUser(id, firstName, lastName, email, birthDate);
+
+        return userRepository.save(new User(firstName, lastName, email, birthDate));
     }
 
     @PutMapping("/user/{id}")
     public User update(@PathVariable String id, @RequestBody Map<String, String> body) throws ParseException {
         int userId = Integer.parseInt(id);
-        String firstName = body.get("firstName");
-        String lastName = body.get("lastName");
-        String email = body.get("email");
-        Date birthDate = formatter.parse(body.get("birthDate"));
+        User user = userRepository.findUserById(userId);
 
-        return userData.updateUser(userId, firstName, lastName, email, birthDate);
+        user.setFirstName(body.get("firstName"));
+        user.setLastName(body.get("lastName"));
+        user.setEmail(body.get("email"));
+        user.setBirthDate(formatter.parse(body.get("birthDate")));
+
+        return userRepository.save(user);
     }
 
     @DeleteMapping("user/{id}")
-    public boolean delete(@PathVariable String id) {
+    public void delete(@PathVariable String id) {
         int userId = Integer.parseInt(id);
-        return userData.delete(userId);
+        userRepository.deleteById(userId);
     }
 
 }
