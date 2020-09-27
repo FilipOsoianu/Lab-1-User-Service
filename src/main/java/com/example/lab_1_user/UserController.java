@@ -19,7 +19,6 @@ public class UserController {
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
-
     @GetMapping("/user")
     public List<User> index() {
         return userRepository.findAll();
