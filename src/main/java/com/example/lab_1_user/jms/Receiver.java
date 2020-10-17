@@ -16,7 +16,14 @@ public class Receiver {
     @JmsListener(destination = USER_QUEUE)
     public void receive(Message message) throws JMSException {
         jmsTemplate.send(message.getJMSReplyTo(), session -> {
-                    jmsTemplate.setPriority(message.getJMSPriority());
+//            TO CHECK PRIORITY
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//           System.out.println(message);
+            jmsTemplate.setPriority(message.getJMSPriority());
                     return message;
                 }
         );

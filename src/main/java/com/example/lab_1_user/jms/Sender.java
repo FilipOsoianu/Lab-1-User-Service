@@ -13,7 +13,8 @@ public class Sender {
     private JmsTemplate jmsTemplate;
 
     public Message send(String message, int priority) {
-
+//        TO CHECK LIMIT NUMBER OF TASKS
+//        System.out.println(message);
         return jmsTemplate.sendAndReceive(USER_QUEUE, session -> {
             jmsTemplate.setExplicitQosEnabled(true);
             jmsTemplate.setPriority(priority);
