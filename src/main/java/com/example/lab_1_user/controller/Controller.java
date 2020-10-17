@@ -30,8 +30,10 @@ public class Controller {
 
     @RequestMapping(value = "/**/{[path:[^\\.]*}")
     public ResponseEntity request(final HttpServletRequest request) throws JMSException, IOException, ParseException {
-        String header = request.getHeader("priority");
-        int priority = header == null ? 4 : Integer.parseInt(header);
+        String priorityString = request.getHeader("priority");
+        String timeOutString = request.getHeader("timeOut");
+        int priority = priorityString == null ? 4 : Integer.parseInt(priorityString);
+        int timeOut = timeOutString == null ? 0 : Integer.parseInt(timeOutString);
         String url = request.getRequestURI();
         String method = request.getMethod();
         StringBuilder sb = new StringBuilder();
@@ -45,7 +47,7 @@ public class Controller {
             reader.close();
         }
         String jsonString = new JSONObject().put("url", url).put("method", method).put("body", sb).toString();
-        TextMessage textMessage = (TextMessage) sender.send(jsonString, priority);
+        TextMessage textMessage = (TextMessage) sender.send(jsonString, priority, timeOut);
 
         JSONObject jsonObject = new JSONObject(textMessage.getText());
         switch (jsonObject.getString("method")) {
@@ -78,7 +80,6 @@ public class Controller {
                         return new ResponseEntity(HttpStatus.BAD_REQUEST);
                     } else {
                         try {
-
                             return new ResponseEntity(UserController.updateUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(6)), jsonObject.getString("body")), HttpStatus.OK);
                         } catch (NumberFormatException nfe) {
                             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -89,11 +90,15 @@ public class Controller {
                 if (jsonObject.getString("url").contains("/user/")) {
                     if (jsonObject.getString("url").substring(6).isEmpty()) {
                         return new ResponseEntity(HttpStatus.BAD_REQUEST);
-                    } else
-                        UserController.deleteUser(userRepository, jsonObject.getString("url").substring(6));
+                    } else {
+                        if (UserController.getUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(6))) != null)
+                            UserController.deleteUser(userRepository, jsonObject.getString("url").substring(6));
+                        else return new ResponseEntity(HttpStatus.OK);
+
+                    }
                 }
             default:
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                return null;
         }
     }
 }

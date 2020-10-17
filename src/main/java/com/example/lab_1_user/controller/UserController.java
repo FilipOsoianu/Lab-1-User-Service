@@ -10,13 +10,13 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.hibernate.internal.util.collections.ArrayHelper.toList;
 
 public class UserController {
 
-    static SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
 
     public static Status getStatus(StatusRepository statusRepository) {
@@ -36,8 +36,8 @@ public class UserController {
         String firstName = body.get("firstName");
         String lastName = body.get("lastName");
         String email = body.get("email");
-        Date birthDate = formatter.parse(body.get("birthDate"));
-
+        LocalDate birthDate = LocalDate.parse(body.get("birthDate"));
+        System.out.println(birthDate);
         return userRepository.save(new User(firstName, lastName, email, birthDate));
     }
 
@@ -49,7 +49,7 @@ public class UserController {
         user.setFirstName(body.get("firstName"));
         user.setLastName(body.get("lastName"));
         user.setEmail(body.get("email"));
-        user.setBirthDate(formatter.parse(body.get("birthDate")));
+        user.setBirthDate(LocalDate.parse(body.get("birthDate")));
 
         return userRepository.save(user);
     }

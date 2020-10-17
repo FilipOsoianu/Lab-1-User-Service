@@ -2,6 +2,7 @@ package com.example.lab_1_user.entities;
 
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -18,7 +19,7 @@ public class User {
 
     private String email;
 
-    private Date birthDate;
+    private LocalDate birthDate;
 
     public User() {
 
@@ -30,14 +31,14 @@ public class User {
         this.email = email;
     }
 
-    public User(String firstName, String lastName, String email, Date birthDate) {
+    public User(String firstName, String lastName, String email, LocalDate birthDate) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.birthDate = birthDate;
     }
 
-    public User(int id, String firstName, String lastName, String email, Date birthDate) {
+    public User(int id, String firstName, String lastName, String email, LocalDate birthDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -50,11 +51,11 @@ public class User {
         return id;
     }
 
-    public Date getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
