@@ -24,6 +24,12 @@ public class User {
 
     }
 
+    public User(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
     public User(String firstName, String lastName, String email, Date birthDate) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -77,5 +83,8 @@ public class User {
         this.email = email;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("Email{to=%s, body=%s}", getEmail(), getFirstName());
+    }
 }
