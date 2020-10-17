@@ -1,72 +1,80 @@
-//package com.example.lab_1_user.controller;
-//
-//import com.example.lab_1_user.entities.Status;
-//import com.example.lab_1_user.entities.User;
-//import com.example.lab_1_user.repositories.StatusRepository;
-//import com.example.lab_1_user.repositories.UserRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
-//import java.util.List;
-//import java.util.Map;
-//
-//@RestController
-//public class UserController {
-//
-//    @Autowired
-//    UserRepository userRepository;
-//    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-//
-//    @Autowired
-//    StatusRepository statusRepository;
-//
-//
-//    @GetMapping("/status")
-//    public Status getStatus() {
-//
-//        return statusRepository.getStatus();
-//    }
-//
-//    @GetMapping("/user")
-//    public List<User> index() {
-//        return userRepository.findAll();
-//    }
-//
-//    @GetMapping("/user/{id}")
-//    public User show(@PathVariable String id) {
-//        int userId = Integer.parseInt(id);
-//        return userRepository.findUserById(userId);
-//    }
-//
-//    @PostMapping("/user")
-//    public User create(@RequestBody Map<String, String> body) throws ParseException {
-//        String firstName = body.get("firstName");
-//        String lastName = body.get("lastName");
-//        String email = body.get("email");
-//        Date birthDate = formatter.parse(body.get("birthDate"));
-//
-//        return userRepository.save(new User(firstName, lastName, email, birthDate));
-//    }
-//
-//    @PutMapping("/user/{id}")
-//    public User update(@PathVariable String id, @RequestBody Map<String, String> body) throws ParseException {
-//        int userId = Integer.parseInt(id);
-//        User user = userRepository.findUserById(userId);
-//
-//        user.setFirstName(body.get("firstName"));
-//        user.setLastName(body.get("lastName"));
-//        user.setEmail(body.get("email"));
-//        user.setBirthDate(formatter.parse(body.get("birthDate")));
-//
-//        return userRepository.save(user);
-//    }
-//
-//    @DeleteMapping("user/{id}")
-//    public void delete(@PathVariable String id) {
-//        int userId = Integer.parseInt(id);
-//        userRepository.deleteById(userId);
-//    }
-//
-//}
+package com.example.lab_1_user.controller;
+
+import com.example.lab_1_user.entities.Status;
+import com.example.lab_1_user.entities.User;
+import com.example.lab_1_user.repositories.StatusRepository;
+import com.example.lab_1_user.repositories.UserRepository;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.hibernate.internal.util.collections.ArrayHelper.toList;
+
+public class UserController {
+
+    static SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
+
+    public static Status getStatus(StatusRepository statusRepository) {
+        return statusRepository.getStatus();
+    }
+
+    public static List<User> getUsers(UserRepository userRepository) {
+        return userRepository.findAll();
+    }
+
+    public static User getUser(UserRepository userRepository, int id) {
+        return userRepository.findUserById(id);
+    }
+
+    public static User createUser(UserRepository userRepository, String json) throws ParseException {
+        Map<String, String> body = toMap(new JSONObject(json));
+        String firstName = body.get("firstName");
+        String lastName = body.get("lastName");
+        String email = body.get("email");
+        Date birthDate = formatter.parse(body.get("birthDate"));
+
+        return userRepository.save(new User(firstName, lastName, email, birthDate));
+    }
+
+    public static User updateUser(UserRepository userRepository, int id, String json) throws ParseException {
+        Map<String, String> body = toMap(new JSONObject(json));
+
+        User user = userRepository.findUserById(id);
+
+        user.setFirstName(body.get("firstName"));
+        user.setLastName(body.get("lastName"));
+        user.setEmail(body.get("email"));
+        user.setBirthDate(formatter.parse(body.get("birthDate")));
+
+        return userRepository.save(user);
+    }
+
+    public static void deleteUser(UserRepository userRepository, String id) {
+        int userId = Integer.parseInt(id);
+        userRepository.deleteById(userId);
+    }
+
+
+    public static Map<String, String> toMap(JSONObject object) throws JSONException {
+        Map<String, String> map = new HashMap<>();
+        Iterator<String> keysItr = object.keys();
+        while (keysItr.hasNext()) {
+            String key = keysItr.next();
+            Object value = object.get(key);
+
+            if (value instanceof JSONArray) {
+                value = toList(value);
+            } else if (value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            map.put(key, (String) value);
+        }
+        return map;
+    }
+
+}
