@@ -18,7 +18,7 @@ public class Receiver {
         jmsTemplate.send(message.getJMSReplyTo(), session -> {
 //            TO CHECK PRIORITY
 //            try {
-//                Thread.sleep(1000);
+//                Thread.sleep(5000);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }

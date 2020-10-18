@@ -37,7 +37,6 @@ public class UserController {
         String lastName = body.get("lastName");
         String email = body.get("email");
         LocalDate birthDate = LocalDate.parse(body.get("birthDate"));
-        System.out.println(birthDate);
         return userRepository.save(new User(firstName, lastName, email, birthDate));
     }
 
