@@ -47,22 +47,23 @@ public class Controller {
             reader.close();
         }
         String jsonString = new JSONObject().put("url", url).put("method", method).put("body", sb).toString();
+        System.out.println(jsonString);
         TextMessage textMessage = (TextMessage) sender.send(jsonString, priority, timeOut);
 
         JSONObject jsonObject = new JSONObject(textMessage.getText());
         switch (jsonObject.getString("method")) {
             case "GET":
-                if (jsonObject.getString("url").equals("/user")) {
+                if (jsonObject.getString("url").equals("/users")) {
                     return new ResponseEntity(UserController.getUsers(userRepository), HttpStatus.OK);
                 } else if (jsonObject.getString("url").equals("/status")) {
                     return new ResponseEntity(UserController.getStatus(statusRepository), HttpStatus.OK);
-                } else if (jsonObject.getString("url").contains("/user/")) {
-                    String id = jsonObject.getString("url").substring(6);
+                } else if (jsonObject.getString("url").contains("/users/")) {
+                    String id = jsonObject.getString("url").substring(7);
                     if (id.isEmpty()) {
                         return new ResponseEntity(HttpStatus.BAD_REQUEST);
                     } else
                         try {
-                            return new ResponseEntity(UserController.getUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(6))), HttpStatus.OK);
+                            return new ResponseEntity(UserController.getUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(7))), HttpStatus.OK);
                         } catch (NumberFormatException nfe) {
                             return new ResponseEntity(HttpStatus.BAD_REQUEST);
                         }
@@ -70,17 +71,17 @@ public class Controller {
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);
                 }
             case "POST":
-                if (jsonObject.getString("url").equals("/user")) {
+                if (jsonObject.getString("url").equals("/users")) {
                     return new ResponseEntity(UserController.createUser(userRepository, jsonObject.getString("body")), HttpStatus.OK);
                 } else
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);
             case "PUT":
-                if (jsonObject.getString("url").contains("/user/")) {
-                    if (jsonObject.getString("url").substring(6).isEmpty()) {
+                if (jsonObject.getString("url").contains("/users/")) {
+                    if (jsonObject.getString("url").substring(7).isEmpty()) {
                         return new ResponseEntity(HttpStatus.BAD_REQUEST);
                     } else {
                         try {
-                            return new ResponseEntity(UserController.updateUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(6)), jsonObject.getString("body")), HttpStatus.OK);
+                            return new ResponseEntity(UserController.updateUser(userRepository, Integer.parseInt(jsonObject.getString("url").substring(7)), jsonObject.getString("body")), HttpStatus.OK);
                         } catch (NumberFormatException nfe) {
                             return new ResponseEntity(HttpStatus.BAD_REQUEST);
                         }
