@@ -1,6 +1,4 @@
 version: '3.1'
-
-
 services:
   db:
     image: mysql
@@ -31,16 +29,38 @@ services:
       spring.active-mq.password: admin
       spring.active-mq.queue: users
 
-  process-spring-service:
+  process-spring-service-1:
     image: process:latest
     ports:
-      - "8082"
+      - "8086:8082"
     restart: always
     depends_on:
       - spring-service
     environment:
       user-service-url: http://spring-service:8080
-      service-port: HOST_PORT
+      service-port: 8086
+
+  process-spring-service:
+    image: process:latest
+    ports:
+      - "8082:8082"
+    restart: always
+    depends_on:
+      - spring-service
+    environment:
+      user-service-url: http://spring-service:8080
+      service-port: 8082
+
+  process-spring-service-2:
+    image: process:latest
+    ports:
+      - "8087:8082"
+    restart: always
+    depends_on:
+      - spring-service
+    environment:
+      user-service-url: http://spring-service:8080
+      service-port: 8087
 
   activemq:
     image: webcenter/activemq:5.14.3
@@ -70,4 +90,3 @@ services:
       ACTIVEMQ_ENABLED_SCHEDULER: "true"
       ACTIVEMQ_MIN_MEMORY: 512
       ACTIVEMQ_MAX_MEMORY: 2048
-
