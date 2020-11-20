@@ -1,0 +1,36 @@
+version: '3.1'
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.6.0
+    ports:
+      - "9201:5400"
+    command: logstash -f /etc/logstash/conf.d/logstash.conf
+    volumes:
+      - ./logstash/logstash.conf:/etc/logstash/conf.d/logstash.conf
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_HOST: host.docker.internal:9200
+    depends_on:
+      - elastic
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.6.0
+    ports:
+      - "5601:5601"
+    environment:
+      SERVER_NAME: kibana
+      SERVER_HOST: kibana
+      ELASTICSEARCH_HOSTS: http://host.docker.internal:9200/
+    depends_on:
+      - elastic
+
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - ./data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
